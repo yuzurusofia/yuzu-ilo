@@ -11,7 +11,7 @@ yuzu_ilo.pyが本体です。
   - unixtimeを省略したときは今日のefia数を確認できます。
 - yuki_kekamu
   - efia数をyuki暦での日付に変換できます。
-  - efia数を省略したときは今日のefia数を確認できます。
+  - efia数を省略したときは今日のyuki暦での日付を確認できます。
 
 # 既知の問題 (未検証のもの含む)
 - float型でも「nanpa ala」と(たぶん)言われる。
