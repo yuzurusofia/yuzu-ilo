@@ -179,7 +179,7 @@ def str_pct(open):
 	return pini
 
 
-def pascal_sneke(open): # Capitalized_Words_With_Underscores
+def pascal_snake(open): # Capitalized_Words_With_Underscores
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
 	ijo = capwords(open)
