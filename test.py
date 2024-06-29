@@ -16,13 +16,17 @@ import yuzu_ilo as qq
 
 # print(qq.pascal_sneke(input('t:')))
 
-# print(qq.base_convert(input('t>'),13))
+try:
+	print(qq.base_convert(input('t>'),13))
+except:
+	print('ike a!')
+	raise
 
 # print(qq.list_int_kebab(input('t>')))
-ijo = qq.prsk(*qq.list_int_kebab(input('t>')), vs_pct=True)
-ijo1 = qq.str_pct(ijo[0])
-ijo2 = qq.str_pct(ijo[4])
-print(ijo1, ijo[1:-1], ijo2)
+# ijo = qq.prsk(*qq.list_int_kebab(input('t>')), vs_pct=True)
+# ijo1 = qq.str_pct(ijo[0])
+# ijo2 = qq.str_pct(ijo[4])
+# print(ijo1, ijo[1:-1], ijo2)
 
 
 
