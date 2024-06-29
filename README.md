@@ -30,7 +30,7 @@ yuzu_ilo.pyが本体です。
   - prskと組み合わせると便利？
 - str_pct
   - floot型の数字をいれると小数点第4位までのパーセント表記に変換します。
-- pascal_sneke
+- pascal_snake
   - Capitalized_Words_With_Underscores
 - base_convert
   - str型の変換前の数字と変換後の底をいれると進数変換ができます。
@@ -58,7 +58,7 @@ yuzu_ilo.pyが本体です。
   - 1970年より前にタイムスリップしない限り大丈夫だと思います。
 - 99行目から111行目
 - efiaとyuki_kekamuの年がマイナスになるときはマイナスの記号にハイフンではなくチルダを使ったほうがいいかもしれない。
-- pascal_snekeが元々大文字だけの単語を最初の文字以外を小文字に変換する。
+- pascal_snakeが元々大文字だけの単語を最初の文字以外を小文字に変換する。
   - capwordsの仕様が原因
 - base_convertが2:12345のような矛盾したものを検知できない。
   - 検知したところで結局ValueErrorにするのでわざわざ検知する理由がない。
