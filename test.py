@@ -40,7 +40,7 @@ import yuzu_ilo as qq
 
 # ijo = input('t>'); print(qq.yuki_kekamu(int(ijo)))
 
-ijo=input('>');print(qq.base_convert(ijo,10))
+# ijo=input('>');print(qq.base_convert(ijo,10))
 
 
 # from yuzu_ilo import efia

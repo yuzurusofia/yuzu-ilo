@@ -119,11 +119,11 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 	
 	if J == 90:
 		neka = 31
-		rosa += -1
+		rosa -= 1
 	if F == 1460:
 		neka = 2
 		rosa = 13
-		ipa += -1
+		ipa -= 1
 	
 	if tuple == False:
 		pini = str(ipa) + 'i:' + str(rosa) + 'r:' + str(neka) + 'n'
@@ -136,19 +136,13 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 def is_alpha(open):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
-	if regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt})+', open):
-		return True
-	else:
-		return False
+	return bool(regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt})+', open))
 
 
 def is_alnum(open):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
-	if regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt}|\p{Nd})+', open):
-		return True
-	else:
-		return False
+	return bool(regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt}|\p{Nd})+', open))
 
 
 
