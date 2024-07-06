@@ -2,8 +2,11 @@
 from re import fullmatch as flm
 import re
 import random
+import math
 from string import capwords
 from time import time as unix
+
+import regex
 from numpy import base_repr
 
 random_2 = random.Random()
@@ -15,20 +18,20 @@ random_2 = random.Random()
 def tuple_dice(open, *, x=1, y=6, z=0): # XdY+Z anu XdY-Z // tuple dice notation
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
-	if flm(r'[0-9]*d?([0-9]*|%)[\+\-]?[0-9]*',open):
-		if re.search(r'[-\+][0-9]+$',open):
-			z = int(re.search(r'[-\+][0-9]+$',open).group())
-			open = re.sub(r'[-\+][0-9]+$','',open)
-		if re.search(r'[0-9]+d',open):
-			x = int(re.search(r'[0-9]+d',open).group()[:-1])
-			open = re.sub(r'[0-9]+d','',open)
-		if re.search(r'[0-9]+',open):
-			y = int(re.search(r'[0-9]+',open).group())
-		if re.search(r'%',open):
-			y = 100
-		return x, y, z
-	else:
+	m = flm(r'([0-9]+(?=d))?d?([0-9]+|%)?([+-]?[0-9]+)?',open)
+	if m is None:
 		raise ValueError('sitelen ni li ike. o kepeken XdY+Z anu XdY-Z. (X en Y en Z li nanpa.)')
+	tmp_x, tmp_y, tmp_z = m.groups()
+	if tmp_x is not None:
+		x = int(tmp_x)
+	if tmp_y is not None:
+		if tmp_y == '%':
+			y = 100
+		else:
+			y = int(tmp_y)
+	if tmp_z is not None:
+		z = int(tmp_z)
+	return x, y, z
 
 
 def dice_roll(x=1, y=6, z=0): # XdY+Z anu XdY-Z
@@ -72,7 +75,7 @@ def dice_2(open, seed=None): # XdY+Z anu XdY-Z en seed // tuple_dice en dice_rol
 
 def efia_int(open=None): # unixtime
 	if open is None:
-		open = int(unix())
+		open = math.floor(unix())
 	elif type(open) is not int:
 		raise TypeError('ni li nanpa ala.')
 	efia = (open - 1632927600) // 86400
@@ -116,17 +119,36 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 	
 	if J == 90:
 		neka = 31
-		rosa = rosa - 1
+		rosa += -1
 	if F == 1460:
 		neka = 2
 		rosa = 13
-		ipa = ipa - 1
+		ipa += -1
 	
 	if tuple == False:
 		pini = str(ipa) + 'i:' + str(rosa) + 'r:' + str(neka) + 'n'
 	else:
 		pini = (ipa, rosa, neka)
 	return pini
+
+
+
+def is_alpha(open):
+	if type(open) is not str:
+		raise TypeError('ni li sitelen ala.')
+	if regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt})+', open):
+		return True
+	else:
+		return False
+
+
+def is_alnum(open):
+	if type(open) is not str:
+		raise TypeError('ni li sitelen ala.')
+	if regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt}|\p{Nd})+', open):
+		return True
+	else:
+		return False
 
 
 
@@ -192,21 +214,22 @@ def base_convert(open, base=2, *, open_base=None, pini_namako=None):
 		raise TypeError('ni pi sitelen nanpa li sitelen ala.')
 	if type(base) is not int:
 		raise TypeError('ni pi nasin nanpa li nanpa ala.')
-	if 1 < base < 37:
+	
+	if 2 <= base <= 36:
 		ijo = open.upper()
-		if re.search(r'^[\+\-]',ijo):
-			pini_namako = re.search(r'^[\+\-]',ijo).group()
-			ijo = re.sub(r'^[\+\-]','',ijo)
+		tmp = flm(r'([+-])([0-9A-Z_:]+)', ijo)
+		if tmp:
+			pini_namako, ijo = tmp.groups()
 		if open_base is not None:
 			nanpa = int(open, base=open_base)
 		elif flm(r'[0-9_]+',ijo):
 			nanpa = int(ijo)
 		elif flm(r'(0[BOX])[0-9A-F_]+',ijo):
 			nanpa = int(ijo, 0)
-		elif flm(r'[0-9]+:[0-9A-Z_]*', ijo):
-			open_base = int(re.search(r'^[0-9]+',ijo).group())
-			if 1 < open_base < 37:
-				ijo = re.sub(r'^[0-9]+:','',ijo)
+		elif m := flm(r'([0-9]+):([0-9A-Z_]+)', ijo):
+			tmp, ijo = m.groups()
+			open_base = int(tmp)
+			if 2 <= open_base <= 36:
 				nanpa = int(ijo, open_base)
 			else:
 				raise ValueError('nasin nanpa pi sitelen ni li ike.')
