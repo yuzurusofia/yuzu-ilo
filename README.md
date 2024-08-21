@@ -27,6 +27,10 @@ yuzu_ilo.pyが本体です。
   - list,tuple,np.ndarrayの中のどれかの型である必要があります。
 - is_panmagic_square
   - 完全魔方陣かどうかを判定できます。
+- ante_nanpa
+  - nasin nanpa puで書かれた数とint型での数を相互に変換します。
+- ante_nanpa_pona
+  - nasin nanpa ponaで書かれた数とint型での数を相互に変換します。
 - prsk
   - プロセカのリザルトのPERFECT, GREAT, GOOD, BAD, MISSを順番にいれると、いろいろなものを確認できます。
     - PERFECTを100%、GREATを70%、GOODを50%としたときの達成率
