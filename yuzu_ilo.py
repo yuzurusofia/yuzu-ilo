@@ -138,7 +138,7 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 # A3 B3 C3 D3
 # A4 B4 C4 D4
 
-def magic_square_4(A1, B1, C1, D1, *, min=0, max=None):
+def magic_square_4(A1, B1, C1, D1, *, min=0, max=None, limit=None):
 	if not (int is type(A1) is type(B1) is type(C1) is type(D1)):
 		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
 	
@@ -213,16 +213,19 @@ def magic_square_4(A1, B1, C1, D1, *, min=0, max=None):
 						continue
 					list.append(B4)
 					
-					tmp1 = B1 + B2 + B3 + B4
-					tmp2 = D1 + C2 + B3 + A4
-					if sum == tmp1 == tmp2:
-						tmp = [
-							[A1,B1,C1,D1],
-							[A2,B2,C2,D2],
-							[A3,B3,C3,D3],
-							[A4,B4,C4,D4],
-							]
-						pini.append(tmp)
+					tmp = [
+						[A1,B1,C1,D1],
+						[A2,B2,C2,D2],
+						[A3,B3,C3,D3],
+						[A4,B4,C4,D4],
+						]
+					pini.append(tmp)
+					
+					if limit is not None:
+						limit -= 1
+						if limit <= 0:
+							return pini
+					
 					del list[-6:]
 				del list[-2:]
 			del list[-2:]
@@ -308,6 +311,115 @@ def is_panmagic_square(kulupu):
 
 
 
+def ante_nanpa_tan_int(nanpa):
+	if type(nanpa) is not int:
+		raise TypeError('ni li nanpa ala.')
+	if nanpa < 0:
+		raise ValueError('nanpa ni li lili a.')
+	
+	if nanpa >= 1:
+		ale = nanpa // 100
+		nanpa %= 100
+		mute = nanpa // 20
+		nanpa %= 20
+		luka = nanpa // 5
+		nanpa %= 5
+		tu = nanpa // 2
+		nanpa %= 2
+		
+		if nanpa == 1:
+			pini = 'ale ' * ale + 'mute ' * mute + 'luka ' * luka + 'tu ' * tu + 'wan'
+			return pini
+		else: # nanpa == 0
+			pini = 'ale ' * ale + 'mute ' * mute + 'luka ' * luka + 'tu ' * tu
+			return pini[:-1]
+		
+	else: # nanpa == 0
+		return 'ala'
+
+
+def ante_nanpa_tan_str(nanpa):
+	if type(nanpa) is not str:
+		raise TypeError('ni li sitelen ala.')
+	if len(nanpa) == 0:
+		raise ValueError('sitelen ni li ala.')
+	
+	nanpa = nanpa.replace(' ','').lower()
+	if nanpa == 'ala':
+		return 0
+	tmp = flm(r'((?:al[ei])*)((?:mute){0,4})((?:luka){0,3})((?:tutu)(?!wan)|(?:tu)?)((?:wan)?)', nanpa)
+	if tmp:
+		ale, mute, luka, tu, wan = tmp.groups()
+		ale = len(ale) // 3
+		mute = len(mute) // 4
+		luka = len(luka) // 4
+		tu = len(tu) // 2
+		wan = len(wan) // 3
+		pini = ale * 100 + mute * 20 + luka * 5 + tu * 2 + wan
+		return pini
+	
+	raise ValueError('sitelen ni li nanpa ala, tawa ilo ni.')
+
+
+def ante_nanpa_pona_tan_int(nanpa):
+	if type(nanpa) is not int:
+		raise TypeError('ni li nanpa ala.')
+	if nanpa < 0:
+		raise ValueError('nanpa ni li lili a.')
+	
+	if nanpa == 0:
+		return 'ala'
+	list = []
+	while nanpa != 0:
+		tmp = nanpa % 100
+		list.append(ante_nanpa_tan_int(tmp))
+		nanpa //= 100
+	return ' ale '.join(reversed(list)).replace(' ala','')
+
+
+def ante_nanpa_pona_tan_str(nanpa):
+	if type(nanpa) is not str:
+		raise TypeError('ni li sitelen ala.')
+	if len(nanpa) == 0:
+		raise ValueError('sitelen ni li ala.')
+	
+	nanpa = nanpa.replace(' ','').lower()
+	if nanpa == 'ala':
+		return 0
+	
+	tmp = nanpa.replace('ali','ale').split('ale')
+	if tmp[0] == '':
+		raise ValueError("nimi open li 'ale' la, ni li nasin nanpa pona ala, tawa ilo ni")
+	list = []
+	for q in tmp:
+		if q == '':
+			list.append(0)
+		else:
+			list.append(ante_nanpa_tan_str(q))
+	list.reverse()
+	pini = [list[q] * (100 ** q) for q in range(0, len(list))]
+	return sum(pini)
+
+
+def ante_nanpa(nanpa):
+	if type(nanpa) is int:
+		return ante_nanpa_tan_int(nanpa)
+	elif type(nanpa) is str:
+		return ante_nanpa_tan_str(nanpa)
+	else:
+		raise TypeError('ni li nanpa ala, li sitelen ala.')
+
+
+def ante_nanpa_pona(nanpa):
+	if type(nanpa) is int:
+		return ante_nanpa_pona_tan_int(nanpa)
+	elif type(nanpa) is str:
+		return ante_nanpa_pona_tan_str(nanpa)
+	else:
+		raise TypeError('ni li nanpa ala, li sitelen ala.')
+
+
+
 def is_alpha(open):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
@@ -383,6 +495,7 @@ def base_convert(open, base=2, *, open_base=10, pini_namako=None):
 		raise TypeError('ni pi nasin nanpa li nanpa ala.')
 	if not 2 <= base <= 36:
 		raise ValueError('nasin nanpa ni li ike')
+	
 	ijo = open.upper()
 	tmp = flm(r'([+-])([0-9A-Z_:]+)', ijo)
 	if tmp:
