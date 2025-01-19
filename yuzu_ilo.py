@@ -1,24 +1,25 @@
-
-from re import fullmatch as flm
+# import
 import re
 import random
 import math
+import time
 from string import capwords
-from time import time as unix
 
 import regex
 import numpy as np
 
+flm = re.fullmatch
 random_2 = random.Random()
 
 
 # ale li 42.
 
 
-def tuple_dice(open, *, x=1, y=6, z=0): # XdY+Z anu XdY-Z // tuple dice notation
+# dice
+def tuple_dice(open='', /, *, x=1, y=6, z=0): # XdY+Z anu XdY-Z // tuple tan dice notation
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
-	m = flm(r'([0-9]+(?=d))?d?([0-9]+|%)?([+-]?[0-9]+)?',open)
+	m = flm(r'([0-9]+(?=d))?d?([0-9]+|%)?([+-]?[0-9]+)?', open)
 	if m is None:
 		raise ValueError('sitelen ni li ike. o kepeken XdY+Z anu XdY-Z. (X en Y en Z li nanpa.)')
 	tmp_x, tmp_y, tmp_z = m.groups()
@@ -46,7 +47,7 @@ def dice_roll(x=1, y=6, z=0): # XdY+Z anu XdY-Z
 	return sum(kulupu,z), kulupu
 
 
-def dice_roll_2(x=1, y=6, z=0, seed=None): # XdY+Z anu XdY-Z en seed
+def dice_roll_2(x=1, y=6, z=0, *, seed=None): # XdY+Z anu XdY-Z en seed
 	if not (int is type(x) is type(y) is type(z)):
 		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
 	if x < 0:
@@ -60,58 +61,56 @@ def dice_roll_2(x=1, y=6, z=0, seed=None): # XdY+Z anu XdY-Z en seed
 	return sum(kulupu,z), kulupu
 
 
-def dice(open): # XdY+Z anu XdY-Z // tuple_dice en dice_roll
+def dice(open='', /): # XdY+Z anu XdY-Z // tuple_dice en dice_roll
 	ijo = tuple_dice(open)
 	ijo = dice_roll(*ijo)
 	return ijo[0]
 
 
-def dice_2(open, seed=None): # XdY+Z anu XdY-Z en seed // tuple_dice en dice_roll_2
+def dice_2(open='', /, *, seed=None): # XdY+Z anu XdY-Z en seed // tuple_dice en dice_roll_2
 	ijo = tuple_dice(open)
-	ijo = dice_roll_2(*ijo, seed)
+	ijo = dice_roll_2(*ijo, seed=seed)
 	return ijo[0]
 
 
 
-def efia_int(open=None): # unixtime
-	if open is None:
-		open = math.floor(unix())
-	elif type(open) is not int:
+
+# yuki-mima
+def efia_int(unixtime=None):
+	if unixtime is None:
+		unixtime = math.floor(time.time())
+	elif type(unixtime) is float:
+		unixtime = math.floor(unixtime)
+	elif type(unixtime) is not int:
 		raise TypeError('ni li nanpa ala.')
-	efia = (open - 1632927600) // 86400
+	efia = (unixtime - 1632927600) // 86400
 	return efia
 
 
-def str_efia(open): # efia_int
-	if type(open) is not int:
+def str_efia(efia): # efia_int
+	if type(efia) is not int:
 		raise TypeError('ni li nanpa ala.')
-	pini = f'e{open:+05}'
+	pini = f'e{efia:+05}'
 	return pini
 
 
-def efia(open=None): # unixtime // efia_int en str_efia
-		return str_efia(efia_int(open))
+def efia(unixtime=None): # efia_int en str_efia
+		return str_efia(efia_int(unixtime))
 
 
-def yuki_kekamu(efia=None, tuple=False): # efia_int
+def yuki_kekamu_tuple(efia=None): # efia_int
 	if efia is None:
 		 efia = efia_int()
 	elif type(efia) is not int:
 		raise TypeError('ni li nanpa ala.')
 	
-	ijo = efia + 7883
-	A = ijo // 146097
-	B = ijo % 146097
-	C = B // 36524
-	D = B % 36524
-	E = D // 1461
-	F = D % 1461
-	G = F // 365
-	H = F % 365
-	I = H // 91
-	J = H % 91
-	K = J // 30
-	L = J % 30
+	Z = efia + 7883
+	A, B = divmod(Z, 146097)
+	C, D = divmod(B, 36524)
+	E, F = divmod(D, 1461)
+	G, H = divmod(F, 365)
+	I, J = divmod(H, 91)
+	K, L = divmod(J, 30)
 	
 	ipa = A * 400 + C * 100 + E * 4 + G + 1
 	rosa = I * 3 + K + 1
@@ -125,12 +124,37 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 		rosa = 13
 		ipa -= 1
 	
-	if tuple == False:
-		pini = str(ipa) + 'i:' + str(rosa) + 'r:' + str(neka) + 'n'
-	else:
-		pini = (ipa, rosa, neka)
-	return pini
+	return (ipa, rosa, neka)
 
+
+def str_yuki_kekamu(ipa, rosa, neka):
+	if not (int is type(ipa) is type(rosa) is type(neka)):
+		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
+	return f'{ipa}i:{rosa}r:{neka}n'
+
+
+def yuki_kekamu(efia=None):
+	tmp = yuki_kekamu_tuple(efia)
+	tmp = str_yuki_kekamu(*tmp)
+	return tmp
+
+
+
+
+# magic square
+def magic_square_1(A1, /):
+	if type(A1) is not int:
+		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
+	
+	sum = A1
+	pini = []
+	if A1 == sum:
+		tmp = [
+			[A1]
+			]
+		pini.append(tmp)
+	
+	return pini
 
 
 # A1 B1 C1 D1
@@ -138,7 +162,7 @@ def yuki_kekamu(efia=None, tuple=False): # efia_int
 # A3 B3 C3 D3
 # A4 B4 C4 D4
 
-def magic_square_4(A1, B1, C1, D1, *, min=0, max=None, limit=None):
+def magic_square_4(A1, B1, C1, D1, /, *, min=0, max=None, limit=None):
 	if not (int is type(A1) is type(B1) is type(C1) is type(D1)):
 		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
 	
@@ -211,7 +235,7 @@ def magic_square_4(A1, B1, C1, D1, *, min=0, max=None, limit=None):
 					if B4 in list or B4 not in nanpa:
 						del list[-5:]
 						continue
-					list.append(B4)
+					list.append(B4) # mi ken weka e ni...?
 					
 					tmp = [
 						[A1,B1,C1,D1],
@@ -226,7 +250,7 @@ def magic_square_4(A1, B1, C1, D1, *, min=0, max=None, limit=None):
 						if limit <= 0:
 							return pini
 					
-					del list[-6:]
+					del list[-6:] # mi weka e pali nanpa 238 la, mi ante e ni tawa [-5:].
 				del list[-2:]
 			del list[-2:]
 		del list[-2:]
@@ -311,6 +335,7 @@ def is_panmagic_square(kulupu):
 
 
 
+# ante nanpa
 def ante_nanpa_tan_int(nanpa):
 	if type(nanpa) is not int:
 		raise TypeError('ni li nanpa ala.')
@@ -318,21 +343,13 @@ def ante_nanpa_tan_int(nanpa):
 		raise ValueError('nanpa ni li lili a.')
 	
 	if nanpa >= 1:
-		ale = nanpa // 100
-		nanpa %= 100
-		mute = nanpa // 20
-		nanpa %= 20
-		luka = nanpa // 5
-		nanpa %= 5
-		tu = nanpa // 2
-		nanpa %= 2
+		ale, nanpa = divmod(nanpa, 100)
+		mute, nanpa = divmod(nanpa, 20)
+		luka, nanpa = divmod(nanpa, 5)
+		tu, wan = divmod(nanpa, 2)
 		
-		if nanpa == 1:
-			pini = 'ale ' * ale + 'mute ' * mute + 'luka ' * luka + 'tu ' * tu + 'wan'
-			return pini
-		else: # nanpa == 0
-			pini = 'ale ' * ale + 'mute ' * mute + 'luka ' * luka + 'tu ' * tu
-			return pini[:-1]
+		pini = 'ale ' * ale + 'mute ' * mute + 'luka ' * luka + 'tu ' * tu + 'wan ' * wan
+		return pini[:-1]
 		
 	else: # nanpa == 0
 		return 'ala'
@@ -344,17 +361,17 @@ def ante_nanpa_tan_str(nanpa):
 	if len(nanpa) == 0:
 		raise ValueError('sitelen ni li ala.')
 	
-	nanpa = nanpa.replace(' ','').lower()
+	nanpa = nanpa.replace(' ', '').lower()
 	if nanpa == 'ala':
 		return 0
 	tmp = flm(r'((?:al[ei])*)((?:mute){0,4})((?:luka){0,3})((?:tutu)(?!wan)|(?:tu)?)((?:wan)?)', nanpa)
 	if tmp:
 		ale, mute, luka, tu, wan = tmp.groups()
-		ale = len(ale) // 3
-		mute = len(mute) // 4
-		luka = len(luka) // 4
-		tu = len(tu) // 2
-		wan = len(wan) // 3
+		ale = len(ale) // len('ale')
+		mute = len(mute) // len('mute')
+		luka = len(luka) // len('luka')
+		tu = len(tu) // len('tu')
+		wan = len(wan) // len('wan')
 		pini = ale * 100 + mute * 20 + luka * 5 + tu * 2 + wan
 		return pini
 	
@@ -371,9 +388,8 @@ def ante_nanpa_pona_tan_int(nanpa):
 		return 'ala'
 	list = []
 	while nanpa != 0:
-		tmp = nanpa % 100
+		tmp, nanpa = divmod(nanpa, 100)
 		list.append(ante_nanpa_tan_int(tmp))
-		nanpa //= 100
 	return ' ale '.join(reversed(list)).replace(' ala','')
 
 
@@ -383,11 +399,11 @@ def ante_nanpa_pona_tan_str(nanpa):
 	if len(nanpa) == 0:
 		raise ValueError('sitelen ni li ala.')
 	
-	nanpa = nanpa.replace(' ','').lower()
+	nanpa = nanpa.replace(' ', '').lower()
 	if nanpa == 'ala':
 		return 0
 	
-	tmp = nanpa.replace('ali','ale').split('ale')
+	tmp = nanpa.replace('ali', 'ale').split('ale')
 	if tmp[0] == '':
 		raise ValueError("nimi open li 'ale' la, ni li nasin nanpa pona ala, tawa ilo ni")
 	list = []
@@ -420,20 +436,28 @@ def ante_nanpa_pona(nanpa):
 
 
 
-def is_alpha(open):
+
+# is ...
+def is_alpha(open, /):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
 	return bool(regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt})+', open))
 
 
-def is_alnum(open):
+def is_alnum(open, /):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
 	return bool(regex.fullmatch(r'(\p{Lu}|\p{Ll}|\p{Lt}|\p{Nd})+', open))
 
 
 
-def prsk_pct_score(p, gr=0, go=0, b=0, m=0, *, p_pct=100, gr_pct=70, go_pct=50, b_pct=0, m_pct=0): # perfect-great-good-bad-miss
+
+# prsk
+def prsk_pct_score(
+		p, gr=0, go=0, b=0, m=0, *,
+		p_pct=100, gr_pct=70, go_pct=50, b_pct=0, m_pct=0,
+		): # perfect-great-good-bad-miss
+	
 	if not (int is type(p) is type(gr) is type(go) is type(b) is type(m)):
 		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
 	max = (p+gr+go+b+m) * 100
@@ -442,12 +466,19 @@ def prsk_pct_score(p, gr=0, go=0, b=0, m=0, *, p_pct=100, gr_pct=70, go_pct=50, 
 	return pct_score
 
 
-def prsk_vs_score(p, gr=0, go=0, b=0, m=0, *, vs_pct=False, p_score=3, gr_score=2, go_score=1, b_score=0, m_score=0): # perfect-great-good-bad-miss
+def prsk_vs_score(
+		p, gr=0, go=0, b=0, m=0, *,
+		p_score=3, gr_score=2, go_score=1, b_score=0, m_score=0,
+		vs_pct=False,
+		): # perfect-great-good-bad-miss
+	
 	if not (int is type(p) is type(gr) is type(go) is type(b) is type(m)):
 		raise TypeError('nanpa ala li lon. o kepeken nanpa taso.')
+	
 	max = (p+gr+go+b+m) * p_score
 	score = p * p_score + gr * gr_score + go * go_score + b * b_score + m * m_score
 	minus_score = score - max
+	
 	if vs_pct == False:
 		return score, minus_score
 	else:
@@ -455,14 +486,16 @@ def prsk_vs_score(p, gr=0, go=0, b=0, m=0, *, vs_pct=False, p_score=3, gr_score=
 		return score, minus_score, max, vs_pct_score
 
 
-def prsk(p, gr=0, go=0, b=0, m=0, *, vs_pct=False):
+def prsk(p, gr=0, go=0, b=0, m=0, *, vs_pct=False): # perfect-great-good-bad-miss
 	pct_score = prsk_pct_score(p, gr, go, b, m)
 	vs_score = prsk_vs_score(p, gr, go, b, m, vs_pct=vs_pct)
 	return pct_score, *vs_score
 
 
 
-def list_int_kebab(open):
+
+# ijo
+def list_int_kebab(open, /):
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
 	if not flm(r'[0-9\-]+', open):
@@ -473,14 +506,14 @@ def list_int_kebab(open):
 	return pini
 
 
-def str_pct(open):
+def str_pct(open, /):
 	if type(open) is not float:
 		raise TypeError('ni li nasin nanpa lili ala.')
 	pini = f'{open:.4%}'
 	return pini
 
 
-def pascal_snake(open): # Capitalized_Words_With_Underscores
+def pascal_snake(open, /): # Capitalized_Words_With_Underscores
 	if type(open) is not str:
 		raise TypeError('ni li sitelen ala.')
 	ijo = capwords(open)
@@ -488,52 +521,61 @@ def pascal_snake(open): # Capitalized_Words_With_Underscores
 	return ijo
 
 
-def base_convert(open, base=2, *, open_base=10, pini_namako=None):
-	if type(open) is not str:
-		raise TypeError('ni pi sitelen nanpa li sitelen ala.')
-	if type(base) is not int:
+def base_conv(open, /, base, *, open_base=10):
+	if type(open) not in (str, int):
+		raise TypeError('ni pi sitelen nanpa li sitelen ala, li nanpa ala.')
+	if type(base) is int:
+		if not 2 <= base <= 36:
+			raise ValueError('nasin nanpa ni li ike')
+	elif base is not int:
 		raise TypeError('ni pi nasin nanpa li nanpa ala.')
-	if not 2 <= base <= 36:
-		raise ValueError('nasin nanpa ni li ike')
 	
-	ijo = open.upper()
-	tmp = flm(r'([+-])([0-9A-Z_:]+)', ijo)
-	if tmp:
-		pini_namako, ijo = tmp.groups()
-	if flm(r'(0[BOX])[0-9A-F_]+',ijo):
-		open_base = 0
-	elif m := flm(r'([0-9]+):([0-9A-Z_]+)', ijo):
-		tmp, ijo = m.groups()
-		open_base = int(tmp)
-	elif not flm(r'[0-9A-Z_]+',ijo):
-		raise ValueError('sitelen ni li ike.')
-	if not(2 <= open_base <= 36 or open_base == 0):
-		raise ValueError('nasin nanpa pi sitelen ni li ike.')
-	nanpa = int(ijo, open_base)
+	if type(open) is str:
+		ijo = open.upper()
+		tmp = flm(r'([+-])([0-9A-Z_:]+)', ijo)
+		if tmp:
+			pini_namako, ijo = tmp.groups()
+		else:
+			pini_namako = None
+		
+		if flm(r'(0[BOX])[0-9A-F_]+', ijo):
+			open_base = 0
+		elif m := flm(r'([0-9]+):([0-9A-Z_]+)', ijo):
+			tmp, ijo = m.groups()
+			open_base = int(tmp)
+		elif not flm(r'[0-9A-Z_]+',ijo):
+			raise ValueError('sitelen ni li ike.')
+		if not(2 <= open_base <= 36 or open_base == 0):
+			raise ValueError('nasin nanpa pi sitelen ni li ike.')
+		
+		nanpa = int(ijo, open_base)
+	else:
+		nanpa = open
+		pini_namako = None
+	
+	if base is int:
+		return nanpa
 	pini = np.base_repr(nanpa, base)
-	if pini_namako:
+	if pini_namako is not None:
 		pini = pini_namako + pini
 	return pini
 
 
 
 
+# namako
+def _answer(*args, **kwargs):
+	time.sleep(750)
+	answer = int('6', 13) * int('9', 13)
+	answer = np.base_repr(answer, 13)
+	return int(answer)
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+# main
+if __name__ == '__main__':
+	... # wip
 
 
 
