@@ -554,7 +554,10 @@ def base_conv(open, /, base, *, open_base=10):
 		pini_namako = None
 	
 	if base is int:
+		if pini_namako == '-':
+			nanpa = -nanpa
 		return nanpa
+	
 	pini = np.base_repr(nanpa, base)
 	if pini_namako is not None:
 		pini = pini_namako + pini
@@ -573,11 +576,10 @@ def _answer(*args, **kwargs):
 
 
 
-# main
+# main (wip)
+def _main():
+	...
+
 if __name__ == '__main__':
-	... # wip
-
-
-
-
+	_main()
 
