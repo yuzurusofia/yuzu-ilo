@@ -388,8 +388,9 @@ def ante_nanpa_pona_tan_int(nanpa):
 		return 'ala'
 	list = []
 	while nanpa != 0:
-		tmp, nanpa = divmod(nanpa, 100)
+		tmp = nanpa % 100
 		list.append(ante_nanpa_tan_int(tmp))
+		nanpa //= 100
 	return ' ale '.join(reversed(list)).replace(' ala','')
 
 
